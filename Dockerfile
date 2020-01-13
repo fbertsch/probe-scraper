@@ -35,6 +35,12 @@ RUN pip install -r requirements.txt
 RUN pip install -r test_requirements.txt
 RUN pip install .
 
+ARG REVISION=""
+
+# Labels follow the standard from opencontainers
+# https://github.com/opencontainers/image-spec/blob/master/annotations.md#rules
+LABEL org.opencontainers.image.revision=${REVISION}
+
 # Drop root and change ownership of the application folder to the user
 RUN chown -R ${USER_ID}:${GROUP_ID} ${HOME}
 USER ${USER_ID}

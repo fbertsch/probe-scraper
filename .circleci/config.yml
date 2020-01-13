@@ -27,7 +27,9 @@ jobs:
       - run:
           name: Build container
           command: |
-            docker build -t app:build .
+            # Labels follow the standard from opencontainers
+            # https://github.com/opencontainers/image-spec/blob/master/annotations.md#rules
+            docker build -t app:build . --label "REVISION={{ .Revision }}"
       - run:
           name: Configure gcloud
           command: |
