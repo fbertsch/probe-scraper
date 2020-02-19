@@ -3,11 +3,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from collections import defaultdict
+from itertools import groupby
 
 
-def transform(node_data):
+def transform(revision_data):
     results = defaultdict(dict)
-    for channel, nodes in node_data.items():
+    for channel, nodes in revision_data.items():
         for node_id, details in nodes.items():
             results[channel][node_id] = {
                 'version': details.get('version'),
@@ -15,3 +16,12 @@ def transform(node_data):
             }
 
     return results
+
+
+def get_latest_revision_per_channel_version(revisions):
+    return {
+        channel: {
+            k: max(list(g), key=lambda x: x[1]['date'])[0]
+            for k, g in groupby(revisions[channel].items(), key=lambda x: x[1]['version'])
+        } for channel in revisions
+    }

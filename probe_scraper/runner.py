@@ -177,7 +177,6 @@ def load_moz_central_probes(cache_dir, out_dir, fx_version, min_fx_version, fire
     probes = parse_moz_central_probes(node_data)
 
     # Transform extracted data: get both the monolithic and by channel probe data.
-    revisions = transform_revisions.transform(node_data)
     probes_by_channel = transform_probes.transform(probes, node_data,
                                                    break_by_channel=True)
     probes_by_channel["all"] = transform_probes.transform(probes, node_data,
@@ -191,15 +190,16 @@ def load_moz_central_probes(cache_dir, out_dir, fx_version, min_fx_version, fire
     revision_probes = parse_moz_central_probes(revision_data)
 
     # Get the minimum revision and date per probe-channel
-    revision_dates = transform_revisions.transform(revision_data)
+    all_revisions = transform_revisions.transform(revision_data)
     first_appeared_dates = transform_probes.get_minimum_date(revision_probes, revision_data,
-                                                             revision_dates)
+                                                             revisions)
+    latest_revisions = transform_revisions.get_latest_revision_per_channel_version(all_revisions)
 
     # Add in the first appeared dates
     probes_by_channel_with_dates = add_first_appeared_dates(probes_by_channel, first_appeared_dates)
 
     # Serialize the probe data to disk.
-    write_moz_central_probe_data(probes_by_channel_with_dates, revisions, out_dir)
+    write_moz_central_probe_data(probes_by_channel_with_dates, latest_revisions, out_dir)
 
 
 def load_glean_metrics(cache_dir, out_dir, repositories_file, dry_run, glean_repo):
